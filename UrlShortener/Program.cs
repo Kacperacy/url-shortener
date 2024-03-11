@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+DatabaseManagementService.MigrationInitialisation(builder);
 
 var app = builder.Build();
 
