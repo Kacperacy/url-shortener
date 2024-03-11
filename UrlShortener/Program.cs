@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UrlShortener;
 using UrlShortener.Models;
@@ -27,12 +28,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/shorten", async (ShortenedUrlRequest request, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
+app.MapGet("/shorten", async (string link, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
 {
     var code = await urlShorteningService.GenerateUniqueCode();
     var shortenedUrl = new ShortenedUrl
     {
-        LongUrl = request.Link,
+        LongUrl = link,
         ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/{code}",
         Code = code,
         CreatedOnUtc = DateTime.UtcNow
