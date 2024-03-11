@@ -1,3 +1,3 @@
 namespace UrlShortener;
 
-public record ShortenedUrlRequest(string LongUrl);
+public record ShortenedUrlRequest(string Link);

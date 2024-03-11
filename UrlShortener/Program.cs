@@ -27,12 +27,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/shorten", async (ShortenedUrlRequest request, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
+app.MapGet("/shorten", async (ShortenedUrlRequest request, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
 {
     var code = await urlShorteningService.GenerateUniqueCode();
     var shortenedUrl = new ShortenedUrl
     {
-        LongUrl = request.LongUrl,
+        LongUrl = request.Link,
         ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/{code}",
         Code = code,
         CreatedOnUtc = DateTime.UtcNow
