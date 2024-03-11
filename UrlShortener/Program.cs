@@ -19,11 +19,11 @@ DatabaseManagementService.MigrationInitialisation(builder);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
-// }
+}
 
 app.UseHttpsRedirection();
 
@@ -33,6 +33,7 @@ app.MapPost("/shorten", async (ShortenedUrlRequest request, ApplicationDbContext
     var shortenedUrl = new ShortenedUrl
     {
         LongUrl = request.LongUrl,
+        ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/{code}",
         Code = code,
         CreatedOnUtc = DateTime.UtcNow
     };
