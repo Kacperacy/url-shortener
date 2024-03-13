@@ -28,13 +28,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/shorten", async (string link, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
+const string apiBasePath = "api";
+
+app.MapGet($"{apiBasePath}/shorten", async (string link, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
 {
     var code = await urlShorteningService.GenerateUniqueCode();
     var shortenedUrl = new ShortenedUrl
     {
         LongUrl = link,
-        ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/{code}",
+        ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/s/{code}",
         Code = code,
         CreatedOnUtc = DateTime.UtcNow
     };
@@ -45,7 +47,7 @@ app.MapGet("/shorten", async (string link, ApplicationDbContext dbContext, UrlSh
     return shortenedUrl;
 });
 
-app.MapGet("{code}", async (string code, ApplicationDbContext dbContext) =>
+app.MapGet("s/{code}", async (string code, ApplicationDbContext dbContext) =>
 {
     var shortenedUrl = await dbContext.ShortenedUrls.SingleOrDefaultAsync(s => s.Code == code);
 
