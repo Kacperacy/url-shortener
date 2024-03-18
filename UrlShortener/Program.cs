@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using UrlShortener;
 using UrlShortener.Models;
@@ -30,8 +31,13 @@ app.UseHttpsRedirection();
 
 const string apiBasePath = "api";
 
-app.MapGet($"{apiBasePath}/shorten", async (string link, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
+app.MapGet($"{apiBasePath}/shorten",  async Task<IResult> (string link, ApplicationDbContext dbContext, UrlShorteningService urlShorteningService, HttpContext httpContext) =>
 {
+    if(Regex.Match(link, @"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)").Success == false)
+    {
+        return Results.BadRequest("Invalid URL");
+    }
+    
     var code = await urlShorteningService.GenerateUniqueCode();
     var shortenedUrl = new ShortenedUrl
     {
@@ -44,7 +50,7 @@ app.MapGet($"{apiBasePath}/shorten", async (string link, ApplicationDbContext db
     dbContext.ShortenedUrls.Add(shortenedUrl);
     await dbContext.SaveChangesAsync();
 
-    return shortenedUrl;
+    return Results.Ok(shortenedUrl);
 });
 
 app.MapGet("s/{code}", async (string code, ApplicationDbContext dbContext) =>
